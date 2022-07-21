@@ -1,33 +1,20 @@
 package org.example;
 
-import java.io.File;
-import java.util.ArrayList;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 
 public class FileWork {
 
-    public FileWork() {
-    }
-
-    public List<File> readDataDirectory(String directoryName){
-        List fileList = new ArrayList();
-        File dir = new File(directoryName);
-
-        if(dir.isDirectory()){
-            for(File item: dir.listFiles()){
-                if(item.isDirectory()){
-                    fileList.addAll(readDataDirectory(item.getAbsolutePath()));
-                    item.delete();
-                } else {
-                    fileList.add(item);
-                    item.delete();
-                }
-            }
-        } else {
-            fileList.add(dir);
-            dir.delete();
+    public List<byte[]> readDataDirectory(String directoryName) {
+        try {
+            FileVisitor fileVisitor = new FileVisitor();
+            Files.walkFileTree(Paths.get(directoryName), fileVisitor);
+            return fileVisitor.getFilesByteList();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-        return fileList;
     }
 
 }
